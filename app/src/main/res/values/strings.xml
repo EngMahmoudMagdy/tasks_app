@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">TasksApp</string>
+    <string name="date">Date</string>
+    <string name="priority">Priority</string>
+    <string name="comments">Comments</string>
+    <string name="filter">Filter</string>
 </resources>

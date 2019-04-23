@@ -1,11 +1,15 @@
-package com.magdy.tasksapp;
+package com.magdy.tasksapp.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.TextView;
+
+import com.magdy.tasksapp.R;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -22,10 +26,10 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
         EditText username = findViewById(R.id.userName);
-        username.setOnKeyListener(new View.OnKeyListener() {
+        username.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
-            public boolean onKey(View view, int i, KeyEvent keyEvent) {
-                if (i == KeyEvent.KEYCODE_ENTER)
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                if (i == KeyEvent.KEYCODE_ENTER ||i == EditorInfo.IME_ACTION_DONE)
                     findViewById(R.id.login).performClick();
                 return false;
             }

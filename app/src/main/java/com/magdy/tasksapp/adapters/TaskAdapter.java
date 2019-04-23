@@ -1,23 +1,31 @@
 package com.magdy.tasksapp.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.magdy.tasksapp.R;
+import com.magdy.tasksapp.activities.TaskDetailsActivity;
+import com.magdy.tasksapp.helpers.ConstantMembers;
 import com.magdy.tasksapp.models.Task;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -25,13 +33,16 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.Holder> {
+public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.Holder> implements Filterable {
     private Context context;
-    private List<Task> taskList;
+    private List<Task> taskList, taskListAll;
+    private DatabaseReference databaseReference;
 
     public TaskAdapter(Context context, List<Task> taskList) {
         this.context = context;
         this.taskList = taskList;
+        this.taskListAll = taskList;
+        databaseReference = FirebaseDatabase.getInstance().getReference(ConstantMembers.TASKS);
     }
 
     @NonNull
@@ -41,27 +52,51 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.Holder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull Holder holder, int position) {
+    public void onBindViewHolder(@NonNull final Holder holder, final int position) {
         final Task task = taskList.get(position);
         holder.name.setText(task.getTitle());
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd yyyy", Locale.US);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(ConstantMembers.DATE_PATTERN, Locale.US);
         holder.date.setText(dateFormat.format(new Date(task.getUpdatedAt())));
+        holder.isDoneCheck.setOnCheckedChangeListener(null);
+        holder.isDoneCheck.setChecked(task.getDone());
         holder.isDoneCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                task.setDone(b);
+                if (compoundButton.isPressed()) {
+                    databaseReference.child(task.getKey())
+                            .child(ConstantMembers.DONE)
+                            .setValue(b);
+                }
             }
         });
 
-        LinearLayout tabStrip = ((LinearLayout) holder.tabLayout.getChildAt(0));
-        for (int i = 0; i < tabStrip.getChildCount(); i++) {
-            tabStrip.getChildAt(i).setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    return true;
-                }
-            });
-        }
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, TaskDetailsActivity.class);
+                intent.putExtra(ConstantMembers.TASK, task);
+                context.startActivity(intent);
+            }
+        });
+
+        holder.tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                databaseReference.child(task.getKey()).child(ConstantMembers.PRIORITY).setValue(tab.getPosition());
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
         switch (task.getPriority()) {
             case 1:
                 if (holder.tabLayout.getTabAt(1) != null)
@@ -80,6 +115,33 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.Holder> {
     @Override
     public int getItemCount() {
         return taskList.size();
+    }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                if (charSequence.toString().trim().isEmpty()) {
+                    taskList = taskListAll;
+                } else if (charSequence.toString().equals("done")) {
+                    taskList = new ArrayList<>();
+                    for (Task task : taskListAll) {
+                        if (task.getDone())
+                            taskList.add(task);
+                    }
+                }
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = taskList;
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults results) {
+                taskList = (List<Task>) results.values;
+                notifyDataSetChanged();
+            }
+        };
     }
 
     public class Holder extends RecyclerView.ViewHolder {

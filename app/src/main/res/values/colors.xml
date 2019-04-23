@@ -2,8 +2,11 @@
 <resources>
     <color name="colorPrimary">#4aa5ec</color>
     <color name="colorPrimaryDark">#989898</color>
+    <color name="colorPrimaryLight">#abafba</color>
     <color name="toolbarColor">#dcedfe</color>
     <color name="colorAccent">#4aa5ec</color>
     <color name="grey">#7f7f7f</color>
+    <color name="greyTrans">#907F7F7F</color>
+    <color name="greyLight">#dfdfdf</color>
     <color name="orange">#f5921b</color>
 </resources>

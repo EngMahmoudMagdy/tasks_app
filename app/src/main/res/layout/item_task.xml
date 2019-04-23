@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/LayoutClickable"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -23,7 +24,6 @@
 
     <LinearLayout
         android:id="@+id/view_foreground"
-        style="@style/LayoutClickable"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/white"
@@ -38,8 +38,8 @@
 
             <CheckBox
                 android:id="@+id/isDoneCheck"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:button="@drawable/check_box_drawable" />
 
             <LinearLayout

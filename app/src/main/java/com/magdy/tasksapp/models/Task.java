@@ -5,8 +5,8 @@ import java.util.Calendar;
 
 public class Task implements Serializable {
 
-    String title;
-    boolean isDone;
+    String title, key;
+    boolean done;
     int priority;
 
     long createdAt, updatedAt;
@@ -20,6 +20,14 @@ public class Task implements Serializable {
         this.title = title;
         createdAt = Calendar.getInstance().getTimeInMillis();
         updatedAt = Calendar.getInstance().getTimeInMillis();
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public long getCreatedAt() {
@@ -46,12 +54,12 @@ public class Task implements Serializable {
         this.title = title;
     }
 
-    public boolean isDone() {
-        return isDone;
+    public boolean getDone() {
+        return done;
     }
 
     public void setDone(boolean done) {
-        isDone = done;
+        this.done = done;
     }
 
     public int getPriority() {
